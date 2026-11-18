@@ -87,6 +87,19 @@ export class AppController {
   })
   @Redirect()
   async redirect(@Query('url') url: string) {
+    const allowedHosts = ['google.com', 'www.google.com'];
+    let parsed: URL;
+    try {
+      parsed = new URL(url);
+    } catch {
+      throw new HttpException('Invalid url', HttpStatus.BAD_REQUEST);
+    }
+    if (
+      (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') ||
+      !allowedHosts.includes(parsed.hostname)
+    ) {
+      throw new HttpException('Url not allowed', HttpStatus.BAD_REQUEST);
+    }
     return { url };
   }
 
